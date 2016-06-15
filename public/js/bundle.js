@@ -1,11 +1,12 @@
 (function () {
 	"use strict";
 
+		angular.module('dataconfig', []);
 		angular.module('directives', []);
 		angular.module('headerCtrl', ['ui.bootstrap']);
     angular.module('homeCtrl', ['ui.bootstrap']);
 
-    angular.module('JadenApp', ['ngMaterial','ngAnimate', 'ui.router','directives', 'config','headerCtrl','homeCtrl']);
+    angular.module('JadenApp', ['ngMaterial','ngAnimate', 'ui.router','directives', 'config', 'dataconfig', 'headerCtrl','homeCtrl']);
 
 })();
 
@@ -13,6 +14,48 @@
   'use strict';
 
   angular.module('config', [ 'ngMaterial' ]);
+
+})();
+
+(function(){
+  'use strict';
+
+  angular
+    .module('dataconfig')
+    .service('jadenInfo', [ 'jadenData', '$filter', function RedInfo(jadenData, $filter){
+      var chips = jadenData.app_chips;
+
+      return {
+        chips: {
+          all: function(){
+            return chips;
+          }
+        }
+      }
+    }])
+    .factory("jadenData", ['$q', '$http', function($q, $http){
+     function JadenInfoData() {
+       var vm = this;
+       //TEST
+       var date = new Date();
+       var d = date.getDate();
+       var m = date.getMonth();
+       var y = date.getFullYear();
+
+       /*App Chips*/
+       /*{"title":"TITLE", "icon":"FONT AWESOME ICON", "span":[h,w]}*/
+       vm.app_chips = [
+         {"id":1, "title":"Settings", "icon":"fa-cog", "span":[1,1], "link":"app.construction"},
+         {"id":2, "title":"Social", "icon":"fa-users", "span":[2,2], "link":"app.construction"},
+         {"id":3, "title":"Camera", "icon":"fa-camera", "span":[1,1], "link":"app.construction"},
+         {"id":4, "title":"Google Tools", "icon":"fa-google", "span":[1,1], "link":"app.construction"},
+         {"id":5, "title":"Dinner Time", "icon":"fa-cutlery", "span":[2,2], "link":"app.construction"}
+       ];
+
+     }
+
+     return new JadenInfoData();
+    }]);
 
 })();
 
@@ -54,10 +97,11 @@
   (function(){
    "use strict";
 
-    angular.module('headerCtrl').controller('HeaderController', ['$state', function($state){
+    angular.module('headerCtrl').controller('HeaderController', ['$state', 'jadenInfo', function($state, jadenInfo){
       var vm = this;
-      vm.checkActivePage = checkActivePage;      
+      vm.checkActivePage = checkActivePage;
 
+      vm.chips = jadenInfo.chips.all();
       function checkActivePage(current) {
 			     var currentPage = $state;
            if (currentPage != null && currentPage.current.name.indexOf(current) > -1) { return true; }
@@ -71,10 +115,11 @@
 (function(){
    "use strict";
 
-    angular.module('homeCtrl').controller('HomeController', ['$state',function($state){
+    angular.module('homeCtrl').controller('HomeController', ['$state', 'jadenInfo', function($state, jadenInfo){
       var vm = this;
       vm.title = "Home";
 
+      vm.chips = jadenInfo.chips.all();
     }]);
 
 })();
