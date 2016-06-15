@@ -1,0 +1,72 @@
+@medium-screen: ~"only screen and (min-width: 801px) and (max-width: 1024px)";
+@tablet-screen: ~"only screen and (min-width: 641px) and (max-width: 800px)";
+@mobile-screen: ~"only screen and (max-width: 640px)";
+
+@font-size: 16px;
+@mainColor: rgb(219,77,77);
+@mainColorBack: rgba(219,77,77,0.5);
+@secondColorBack: rgba(239,241,245,1);
+
+html, body {
+  height: 100%;
+  color: #000;
+
+  font-size: @font-size;
+
+  @media @medium-screen { font-size: 14px; }
+  @media @tablet-screen { font-size: 12px; }
+  @media @mobile-screen { font-size: 10px; }
+}
+.header {
+  z-index:100;
+}
+.mainBody {
+  z-index:50;
+  padding: 62px 1% 0% 1%;
+  min-height: 1000px;
+}
+
+// Navigation
+.nav-container {
+  z-index: 100;
+  #j-main-nav {
+    background-color: rgba(0,0,0,0.9);
+    z-index: 100;
+    &.screenPass {
+      position:fixed;
+      top:0;
+      width:100%;
+    }
+    .container {
+      .navbar-collapse {
+        #j-inside-nav {
+          li {
+            @media @tablet-screen { width:100%; }
+            @media @mobile-screen { width:100%; }
+            a {
+              text-align: center;
+              border-top:2px solid rgba(0,0,0,1);
+              color: rgba(255,255,255,1);
+              &:hover, &:focus{
+                background-color: rgba(204,204,204,0.5);
+                border-top:2px solid rgba(204,204,204,0.2);
+              }
+              &.active {
+                color:@mainColor;
+                border-top: 2px solid @mainColor;
+                font-weight: bold;
+              }
+              &.donate-link {
+                background-color: @mainColor;
+                border-top: 2px solid @mainColor;
+                &.active { background-color:transparent;  }
+                &:hover, &:focus{ background-color: rgba(204,204,204,0.5); border-top:2px solid rgba(204,204,204,0.2); }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+}
