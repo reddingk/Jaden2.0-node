@@ -1,13 +1,12 @@
 <h1>Jaden</h1>
-<p>{{hc.title}}</p>
-<p>Main page it worked !!!</p>
 
-<div ng-repeat="chip in hc.chips">{{chip.title}}</div>
-
-<div flex="" ng-cloak="" class="gridListdemoDynamicTiles">
-  <md-grid-list md-cols="1" md-cols-sm="2" md-cols-md="3" md-cols-gt-md="3" md-row-height="10rem" md-gutter="8px" md-gutter-gt-sm="4px" >
-    <md-grid-tile ng-repeat="tile in hc.chips" md-rowspan="{{tile.span[0]}}" md-colspan="{{tile.span[1]}}" md-colspan-sm="1" md-colspan-xs="1" class="default-tile">
-      <md-grid-tile-footer><h3><i class="fa {{tile.icon}}"></i> {{tile.title}}</h3></md-grid-tile-footer>
+<div flex="" ng-cloak="" class="homeTiles">
+  <md-grid-list md-cols="1" md-cols-sm="2" md-cols-md="3" md-cols-gt-md="6" md-row-height="5rem" md-gutter="8px" md-gutter-gt-sm="4px" >
+    <md-grid-tile ng-repeat="tile in hc.chips" ng-click="hc.changeFocus(tile.link)" md-rowspan="{{tile.span[0]}}" md-colspan="{{tile.span[1]}}" md-colspan-sm="1" md-colspan-xs="1" class="tile" ng-style="{'background':tile.color}">
+      <md-grid-tile-header><h3><i class="fa {{tile.icon}}"></i> {{tile.title}}</h3></md-grid-tile-header>
+      <md-grid-tile-content></md-grid-tile-content>
     </md-grid-tile>
   </md-grid-list>
 </div>
+
+<div style="clear:both"></div>

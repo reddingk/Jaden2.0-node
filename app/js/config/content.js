@@ -24,7 +24,7 @@
        var y = date.getFullYear();
 
        /*App Chips*/
-       /*{"title":"TITLE", "icon":"FONT AWESOME ICON", "span":[h,w]}*/
+       /*{"title":"TITLE", "icon":"FONT AWESOME ICON", "span":[h,w], "link":"INSIDE APP LINK"}*/
        vm.app_chips = [
          {"id":1, "title":"Settings", "icon":"fa-cog", "span":[1,1], "link":"app.construction"},
          {"id":2, "title":"Social", "icon":"fa-users", "span":[2,2], "link":"app.construction"},

@@ -10,6 +10,67 @@
 
 })();
 
+  (function(){
+   "use strict";
+
+    angular.module('headerCtrl').controller('HeaderController', ['$state', 'jadenInfo', function($state, jadenInfo){
+      var vm = this;
+      /*Functions*/
+      vm.checkActivePage = checkActivePage;
+      vm.selectChip = selectChip;
+
+      /*Variables*/
+      vm.chips = jadenInfo.chips.all();
+      vm.selected = null;
+
+      function checkActivePage(current) {
+			     var currentPage = $state;
+           if (currentPage != null && currentPage.current.name.indexOf(current) > -1) { return true; }
+			     else { return false; }
+		  }
+
+      function selectChip(newstate) {
+        $state.go(newstate.link);
+      }
+
+    }]);
+
+})();
+
+(function(){
+   "use strict";
+
+    angular.module('homeCtrl').controller('HomeController', ['$state', 'jadenInfo', function($state, jadenInfo){
+      var vm = this;
+      /*Functions*/
+      vm.getChipsWithColor = getChipsWithColor;
+      vm.changeFocus = changeFocus;
+
+      /*Variables*/
+      vm.title = "Home";
+      vm.chips = null;
+
+      /*Start up functions*/
+      vm.getChipsWithColor();
+
+      function getChipsWithColor() {
+        var tmpchips = jadenInfo.chips.all();
+        var colorArray = randomColor({ count: tmpchips.length + 1, luminosity: 'bright', format: 'rgb'});
+
+        for(var i =0; i < tmpchips.length; i++) {
+          tmpchips[i].color = colorArray[i];
+        }
+        vm.chips = tmpchips;
+      };
+
+      function changeFocus(newstate) {
+        $state.go(newstate);
+      }
+
+    }]);
+
+})();
+
 (function(){
   'use strict';
 
@@ -43,7 +104,7 @@
        var y = date.getFullYear();
 
        /*App Chips*/
-       /*{"title":"TITLE", "icon":"FONT AWESOME ICON", "span":[h,w]}*/
+       /*{"title":"TITLE", "icon":"FONT AWESOME ICON", "span":[h,w], "link":"INSIDE APP LINK"}*/
        vm.app_chips = [
          {"id":1, "title":"Settings", "icon":"fa-cog", "span":[1,1], "link":"app.construction"},
          {"id":2, "title":"Social", "icon":"fa-users", "span":[2,2], "link":"app.construction"},
@@ -91,36 +152,6 @@
       //$locationProvider.html5Mode(true);
     }]);
 
-
-})();
-
-  (function(){
-   "use strict";
-
-    angular.module('headerCtrl').controller('HeaderController', ['$state', 'jadenInfo', function($state, jadenInfo){
-      var vm = this;
-      vm.checkActivePage = checkActivePage;
-
-      vm.chips = jadenInfo.chips.all();
-      function checkActivePage(current) {
-			     var currentPage = $state;
-           if (currentPage != null && currentPage.current.name.indexOf(current) > -1) { return true; }
-			     else { return false; }
-		  }
-
-    }]);
-
-})();
-
-(function(){
-   "use strict";
-
-    angular.module('homeCtrl').controller('HomeController', ['$state', 'jadenInfo', function($state, jadenInfo){
-      var vm = this;
-      vm.title = "Home";
-
-      vm.chips = jadenInfo.chips.all();
-    }]);
 
 })();
 
