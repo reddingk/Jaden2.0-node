@@ -13,21 +13,16 @@
           }
         },
         tastekid: {
-          all_similar: function(query) {
-            console.log("Made It");
+          all_similar: function(query) {            
             var api = apiData.getApiItem("tasteKid");
             if(api != null) {
-              var api_url = api.link +"similar?q="+query+"&k="+api.key;
+              var api_url = api.link +"similar?q="+query+"&callback=JSON_CALLBACK&k="+api.key;
+              //&callback=test()
               var def = $q.defer();
 
-              $http({
-                method: 'GET',
-                url: api_url
-              }).then(function successCallback(response) {
-                console.log(response);
-                def.resolve(response.data);
-              }, function errorCallback(response) {
-                def.reject(response);
+              $http.jsonp(api_url)
+              .success(function (data) {
+                def.resolve(data);
               });
 
               return def.promise;
