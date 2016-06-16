@@ -1,0 +1,21 @@
+<h1>Jada</h1>
+
+<div class="jada-conversation">
+  <div class="jada-search">
+    <input class="searchBar" type="text" name="input" placeholder="Feel Free to Ask Me Anything" ng-model="jc.search" ng-trim="false">
+    <div class="searchBtnGroup">
+      <md-button class="md-fab md-primary" aria-label="Search" ng-click="jc.textJada()" ng-disabled="jc.search.length < 1"><i class="fa fa-search"></i></md-button>
+      <md-button class="md-fab md-primary" aria-label="Talk" ng-click="jc.talkToJada()" ng-disabled="true"><i class="fa fa-microphone"></i></md-button>
+    </div>
+  </div>
+
+  <div class="jada-response">
+    <div class="jada-convo" ng-repeat="convo in jc.jadaResponse | orderBy:'-id'">
+      <div class="user-statement">{{convo.user}}</div>
+      <div class="jada-statement">{{convo.response}}</div>
+      <div style="clear:both"></div>
+    </div>
+
+    <div style="clear:both"></div>
+  </div>
+</div>

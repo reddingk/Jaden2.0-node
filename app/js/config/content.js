@@ -3,7 +3,7 @@
 
   angular
     .module('dataconfig')
-    .service('jadenInfo', [ 'jadenData', '$filter', function RedInfo(jadenData, $filter){
+    .service('jadenInfo', [ 'jadenData', '$filter', function JadenInfo(jadenData, $filter){
       var chips = jadenData.app_chips;
 
       return {

@@ -5,8 +5,314 @@
 		angular.module('directives', []);
 		angular.module('headerCtrl', ['ui.bootstrap']);
     angular.module('homeCtrl', ['ui.bootstrap']);
+		angular.module('jadaCtrl', ['ui.bootstrap']);
 
-    angular.module('JadenApp', ['ngMaterial','ngAnimate', 'ui.router','directives', 'config', 'dataconfig', 'headerCtrl','homeCtrl']);
+    angular.module('JadenApp', ['ngMaterial','ngAnimate', 'ui.router','directives', 'config', 'dataconfig', 'headerCtrl','homeCtrl', 'jadaCtrl']);
+
+})();
+
+(function(){
+  'use strict';
+
+  angular
+    .module('dataconfig')
+    .service('apiInfo', [ 'apiData', '$filter', '$q', '$http', function ApiInfo(apiData, $filter, $q, $http){
+      var api_list = apiData.app_apis;
+
+      return {
+        list: {
+          all: function(){
+            return chips;
+          }
+        },
+        tastekid: {
+          all_similar: function(query) {
+            console.log("Made It");
+            var api = apiData.getApiItem("tasteKid");
+            if(api != null) {
+              var api_url = api.link +"similar?q="+query+"&k="+api.key;
+              var def = $q.defer();
+
+              $http({
+                method: 'GET',
+                url: api_url
+              }).then(function successCallback(response) {
+                console.log(response);
+                def.resolve(response.data);
+              }, function errorCallback(response) {
+                def.reject(response);
+              });
+
+              return def.promise;
+            }
+            else
+            { return null; }
+          }
+        }
+      }
+    }])
+    .factory("apiData", ['$q', '$http', function($q, $http){
+     function ApiInfoData() {
+       var vm = this;
+       vm.app_apis = [
+         {"name":"tasteKid", "link":"https://www.tastekid.com/api/","key":"228198-JadenPer-P426AN1R"}
+       ];
+
+       vm.getApiItem = function(name){
+         var item = null;
+         for(var i =0; i < vm.app_apis.length; i++) {
+           if(vm.app_apis[i].name == name)
+           { item = vm.app_apis[i]; }
+         }
+         return item;
+       }
+     }
+
+     return new ApiInfoData();
+    }]);
+
+})();
+
+(function(){
+  'use strict';
+
+  angular.module('config', [ 'ngMaterial' ]);
+
+})();
+
+(function(){
+  'use strict';
+
+  angular
+    .module('dataconfig')
+    .service('jadenInfo', [ 'jadenData', '$filter', function JadenInfo(jadenData, $filter){
+      var chips = jadenData.app_chips;
+
+      return {
+        chips: {
+          all: function(){
+            return chips;
+          }
+        }
+      }
+    }])
+    .factory("jadenData", ['$q', '$http', function($q, $http){
+     function JadenInfoData() {
+       var vm = this;
+       //TEST
+       var date = new Date();
+       var d = date.getDate();
+       var m = date.getMonth();
+       var y = date.getFullYear();
+
+       /*App Chips*/
+       /*{"title":"TITLE", "icon":"FONT AWESOME ICON", "span":[h,w], "link":"INSIDE APP LINK"}*/
+       vm.app_chips = [
+         {"id":1, "title":"Settings", "icon":"fa-cog", "span":[1,1], "link":"app.construction"},
+         {"id":2, "title":"Social", "icon":"fa-users", "span":[2,2], "link":"app.construction"},
+         {"id":3, "title":"Camera", "icon":"fa-camera", "span":[1,1], "link":"app.construction"},
+         {"id":4, "title":"Google Tools", "icon":"fa-google", "span":[1,1], "link":"app.construction"},
+         {"id":5, "title":"Dinner Time", "icon":"fa-cutlery", "span":[2,2], "link":"app.construction"}
+       ];
+
+     }
+
+     return new JadenInfoData();
+    }]);
+
+})();
+
+(function(){
+  'use strict';
+
+  angular
+    .module('dataconfig')
+    .service('jBrainInfo', [ 'jBrain', 'apiInfo', '$filter', function BrainInfo(jBrain, apiInfo,  $filter){
+
+
+      return {
+        talk: {
+          task: function(phrase){
+            var response = jBrain.convo(phrase);
+
+            return response;
+          }
+        }
+      }
+    }])
+    .factory("jBrain", ['$q', '$http', 'apiInfo', function($q, $http, apiInfo){
+     function JBrainData() {
+       var vm = this;
+
+       /*Functions*/
+       vm.convo = convo;
+       /*Main conversation function*/
+       function convo(phrase){
+         var str = phrase.split(" ");
+         var responseFunction = null;
+         /*Get phrase and resonse*/
+         for(var i = 0; i < str.length; i++) {
+           for(var j =0; j < vm.phraseLibrary.length; j++) {
+             /*Found matching action phrase*/
+             if(str[i].toLowerCase() == vm.phraseLibrary[j].action || (vm.phraseLibrary[j].additional_phrases != undefined && vm.phraseLibrary[j].additional_phrases.indexOf(str[i].toLowerCase()) > -1) ) {
+               if(vm.phraseLibrary[j].subactions == null || i+1 >= str.length)
+                { responseFunction = vm.phraseLibrary[j]; }
+               else {
+                 // check all sub actions and return responseFunction
+                 var tmpResp = getSubActionResponse(str.slice(i, str.length), vm.phraseLibrary[j].subactions);
+                 if(tmpResp == null)
+                  responseFunction = vm.phraseLibrary[j];
+                else
+                  { responseFunction = tmpResp; }
+               }
+             }
+           }
+         }
+         console.log(responseFunction);
+         // return function
+         if(responseFunction == null)
+         { return {"code":-1, "response": "Sorry I am not sure what you would like"};  }
+         else
+         { return Action(responseFunction, str) }
+       }
+
+       /*Recursive sub action check*/
+       function getSubActionResponse(subPhrase, subactions) {
+
+         for(var i = 0; i < subPhrase.length; i++) {
+           for(var j =0; j < subactions.length; j++) {
+             /*Found matching action phrase*/
+             if(subPhrase[i].toLowerCase() == subactions[j].action) {
+               if(subactions[j].subactions == null || i+1 >= subPhrase.length) {
+                 return subactions[j];
+               }
+               else {
+                 // check all sub actions and return responseFunction
+                 return getSubActionResponse(subPhrase.slice(i, subPhrase.length), subactions[j].subactions);
+               }
+             }
+             else if ( i+1 == subPhrase.length) {
+               return null;
+             }
+           }
+         }
+       }
+
+       function Action(responseFunction, strPhrase)
+       {
+         var response = null;
+         switch(responseFunction.response) {
+          case "greetings":
+            response = {"code":1, "response": "Hey, Kris hows things treating you (I'm sure you will add more greetings soon)"};
+            break;
+          case "getLocalTime":
+            var date = new Date();
+            var h = (date.getHours() > 12 ? date.getHours() - 12 : date.getHours());
+            var m = (date.getMinutes() < 10 ? "0"+ date.getMinutes() : date.getMinutes());
+            var timeDelim = (date.getHours() > 12 ? "pm" : "am");
+            var timeStr = "The time according to this machine is " + h + ":" + m +" " + timeDelim + " ";
+            response = {"code":1, "response": timeStr};
+            break;
+          case "getTimeZoneTime":
+            if(strPhrase.indexOf(responseFunction.action) + 1 >= strPhrase.length)
+              response = {"code":-2, "response": "Sorry no location given !!!"};
+            else {
+              var location = strPhrase.splice(strPhrase.indexOf(responseFunction.action) + 1, strPhrase.length);
+              response = {"code":1, "response": "Still working on getting times from around the world and places like: " + location};
+            }
+            break;
+          case "getTastekidResults":
+            var media = strPhrase.splice(strPhrase.indexOf(responseFunction.action) + 1, strPhrase.length);
+            console.log(media.join("+"));
+            var results = apiInfo.tastekid.all_similar(media.join("+"));
+            if(results == null) {
+              response = {"code":-2, "response": "Something is up with searching for: " + media.join("+")};
+            }
+            else {
+              var itemList = "";
+              for(var j =0; j < results.Similar.Results.length; j++) {
+                itemList += results.Similar.Results[j].Name +" (" + results.Similar.Results[j].Type +")";
+                if(j+1 < results.Similar.Results.length)
+                  itemList+=", ";
+              }
+              response = {"code":1, "response": "According to Tastekid for " + results.Similar.Info.Name + " (" + results.Similar.Info.Type+") the following are sugguested that you checkout: " + itemList};
+            }
+            break;
+          default:
+            response = {"code":-2, "response": "Sorry I'm not sure what to do!!!"};
+            break;
+         }
+
+         if(response == null)
+         { return {"code":-22, "response": "Sorry Something went wrong!!!"}; }
+         else
+         { return response; }
+
+       }
+
+
+       /*
+        PHRASE LIBRARY
+        action: ACTION WORD
+        response: RESPONSE FUNCTION
+        additional_phrases: ADDITIONAL PHRASEING FOR SAME ACTION
+        subactions: SUB ACTIONS UNDER SAME CATEGORY
+       */
+       vm.phraseLibrary = [
+         {"action": "hello", "response":"greetings", "additional_phrases":["hi", "hey"]},
+         {"action": "time", "response":"getLocalTime", "subactions":[ {"action":"in", "response":"getTimeZoneTime"}]},
+         {"action": "similar", "response":"", "subactions":[ {"action":"media", "response":"", "subactions":[ {"action":"to", "response":"getTastekidResults"}]}]}
+       ];
+
+     }
+
+     return new JBrainData();
+    }]);
+
+})();
+
+(function(){
+
+  angular
+    .module('config')
+    .config(['$stateProvider', '$urlRouterProvider','$locationProvider', function($stateProvider, $urlRouterProvider, $locationProvider) {
+      $stateProvider
+      .state('app', {
+        url: "/",
+        views: {
+          'content':{
+            templateUrl: 'views/home.html',
+            controller: 'HomeController as hc'
+          },
+          'header':{
+            templateUrl: 'views/templates/_header.html',
+            controller: 'HeaderController as hdc'
+          }
+        }
+      })
+      .state('app.jada', {
+        url: "jada",
+        views: {
+          'content@': {
+            templateUrl: 'views/jada.html',
+            controller: 'JadaController as jc'
+          }
+        }
+      })
+      .state('app.construction', {
+        url: "underconstruction",
+        views: {
+          'content@': {
+            templateUrl: 'views/construction.html'
+          }
+        }
+      });
+
+
+      $urlRouterProvider.otherwise('/');
+      //$locationProvider.html5Mode(true);
+    }]);
+
 
 })();
 
@@ -72,86 +378,47 @@
 })();
 
 (function(){
-  'use strict';
+   "use strict";
 
-  angular.module('config', [ 'ngMaterial' ]);
+    angular.module('jadaCtrl').controller('JadaController', ['$state', 'jadenInfo', 'jBrainInfo', function($state, jadenInfo, jBrainInfo){
+      var vm = this;
+      /*Functions*/
+      vm.changeFocus = changeFocus;
+      vm.textJada = textJada;
+      vm.talkToJada = talkToJada;
 
-})();
+      /*Variables*/
+      vm.title = "Jada";
+      vm.chips = jadenInfo.chips.all();
+      vm.search="";
+      vm.jadaResponse = [];
 
-(function(){
-  'use strict';
 
-  angular
-    .module('dataconfig')
-    .service('jadenInfo', [ 'jadenData', '$filter', function RedInfo(jadenData, $filter){
-      var chips = jadenData.app_chips;
-
-      return {
-        chips: {
-          all: function(){
-            return chips;
-          }
-        }
+      vm.test = jBrainInfo.talk.task("What time is it right now in Chicago, Illinois");
+      function changeFocus(newstate) {
+        $state.go(newstate);
       }
-    }])
-    .factory("jadenData", ['$q', '$http', function($q, $http){
-     function JadenInfoData() {
-       var vm = this;
-       //TEST
-       var date = new Date();
-       var d = date.getDate();
-       var m = date.getMonth();
-       var y = date.getFullYear();
 
-       /*App Chips*/
-       /*{"title":"TITLE", "icon":"FONT AWESOME ICON", "span":[h,w], "link":"INSIDE APP LINK"}*/
-       vm.app_chips = [
-         {"id":1, "title":"Settings", "icon":"fa-cog", "span":[1,1], "link":"app.construction"},
-         {"id":2, "title":"Social", "icon":"fa-users", "span":[2,2], "link":"app.construction"},
-         {"id":3, "title":"Camera", "icon":"fa-camera", "span":[1,1], "link":"app.construction"},
-         {"id":4, "title":"Google Tools", "icon":"fa-google", "span":[1,1], "link":"app.construction"},
-         {"id":5, "title":"Dinner Time", "icon":"fa-cutlery", "span":[2,2], "link":"app.construction"}
-       ];
-
-     }
-
-     return new JadenInfoData();
-    }]);
-
-})();
-
-(function(){
-
-  angular
-    .module('config')
-    .config(['$stateProvider', '$urlRouterProvider','$locationProvider', function($stateProvider, $urlRouterProvider, $locationProvider) {
-      $stateProvider
-      .state('app', {
-        url: "/",
-        views: {
-          'content':{
-            templateUrl: 'views/home.html',
-            controller: 'HomeController as hc'
-          },
-          'header':{
-            templateUrl: 'views/templates/_header.html',
-            controller: 'HeaderController as hdc'
-          }
+      function textJada() {
+        var dialog = "";
+        if(vm.search == null) {
+          dialog = {"id":vm.jadaResponse.length+1 ,"user":vm.search, "response":"Hey just ask me something and I'll let you know whats up."}
         }
-      }).state('app.construction', {
-        url: "underconstruction",
-        views: {
-          'content@': {
-            templateUrl: 'views/construction.html'
-          }
+        else {
+          var jresponse = jBrainInfo.talk.task(vm.search);
+          if(jresponse.code < 0)
+            console.log("Error Code: " + jresponse.code);
+          dialog = {"id":vm.jadaResponse.length+1 ,"user":vm.search, "response":jresponse.response}
         }
-      });
+        vm.jadaResponse.push(dialog);
+        vm.search = null;
+      }
 
+      function talkToJada() {
 
-      $urlRouterProvider.otherwise('/');
-      //$locationProvider.html5Mode(true);
+      }
+
     }]);
-
 
 })();
 

@@ -16,7 +16,17 @@
             controller: 'HeaderController as hdc'
           }
         }
-      }).state('app.construction', {
+      })
+      .state('app.jada', {
+        url: "jada",
+        views: {
+          'content@': {
+            templateUrl: 'views/jada.html',
+            controller: 'JadaController as jc'
+          }
+        }
+      })
+      .state('app.construction', {
         url: "underconstruction",
         views: {
           'content@': {
