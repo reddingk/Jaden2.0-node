@@ -1,0 +1,54 @@
+<div class="chipLayout">
+  <section class="selectedScreen">
+    <h1>{{cc.title}}</h1>
+
+    <div class="chipsearch">
+      <input class="searchBar" type="text" name="input" placeholder="Enter A Media Item To Get Similar Items" ng-model="cc.search" ng-trim="false">
+      <div class="selectGroup">
+        <md-menu md-position-mode="target-right target">
+          <md-button aria-label="Select Media Type" class="md-icon-button select-button" ng-click="$mdOpenMenu($event)">
+            <p><span>{{cc.selectedItem.name}}</span> <i class="selected-icon fa {{cc.selectedItem.icon}}"></i> <i class="fa fa-caret-down"></i></p>
+          </md-button>
+          <md-menu-content width="4">
+            <md-menu-item ng-repeat="item in cc.items">
+              <md-button ng-click="cc.changeType(item)">
+                  <div layout="row" flex="">
+                    <p flex="">{{item.name}}</p>
+                    <i class="fa {{item.icon}}"></i>
+                  </div>
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+      </div>
+      <div class="searchBtnGroup">
+        <md-button class="md-fab md-primary" aria-label="Search" ng-click="cc.getSimilarMedia()" ng-disabled="cc.search.length < 1"><i class="fa fa-search"></i></md-button>
+        <md-button class="md-fab md-primary" aria-label="Talk" ng-click="" ng-disabled="true"><i class="fa fa-microphone"></i></md-button>
+      </div>
+    </div>
+    <div class="listResults" ng-show="cc.simResults.Similar.Results.length > 0">
+      <p>The following results have been recommended to you based you your search: </p>
+      <uib-accordion close-others="true">
+        <uib-accordion-group ng-repeat="item in cc.simResults.Similar.Results">
+          <uib-accordion-heading is-open="status.open">
+            <i class="fa" ng-class="{'fa-film':item.Type == 'movie', 'fa-television':item.Type == 'show', 'fa-music':item.Type == 'music', 'fa-book':item.Type == 'book', 'fa-pencil-square-o':item.Type == 'author', 'fa-gamepad':item.Type == 'game'}"></i> {{item.Name}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+          </uib-accordion-heading>
+          <div><div class="item-header">Type</div> <div class="item-content">{{item.Type}}</div></div>
+          <div><div class="item-header">Description</div> <div class="item-content">{{item.wTeaser}}</div></div>
+          <div ng-if="item.wUrl != undefined"><div class="item-header">Wikepedia</div> <div class="item-link"><a href='{{item.wUrl}}' target="_blank">Wikepedia Link</a></div></div>
+          <div ng-if="item.yID != undefined"><div class="item-header">Video</div> <div class="item-video"><a href="https://www.youtube.com/watch?v={{item.yID}}" target="_blank"><i class="fa fa-youtube-square fa-4x"></i></a></div></div>
+        </uib-accordion-group>
+      </uib-accordion>
+    </div>
+  </section>
+
+  <section class="additionalChips">
+    <div flex="" ng-cloak="" class="additionalTiles">
+      <md-grid-list md-cols="1" md-cols-sm="2" md-cols-md="3" md-cols-gt-md="8" md-row-height="1:1" md-gutter="8px" md-gutter-gt-sm="4px" >
+        <md-grid-tile ng-repeat="tile in cc.chips" ng-click="cc.changeFocus(tile.link)" md-rowspan="1" md-colspan="1" md-colspan-sm="1" md-colspan-xs="1" class="tile" ng-style="{'background':tile.color}">
+          <md-grid-tile-content><h3><i class="fa {{tile.icon}}"></i> {{tile.title}}</h3></md-grid-tile-content>
+        </md-grid-tile>
+      </md-grid-list>
+    </div>
+  </section>
+</div>

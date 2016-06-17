@@ -33,6 +33,16 @@
             templateUrl: 'views/construction.html'
           }
         }
+      })
+      /*Chip views*/
+      .state('app.mediaSuggestions', {
+        url: "mediaSuggestions",
+        views: {
+          'content@': {
+            templateUrl: 'views/chipviews/mediaSuggestions.html',
+            controller: 'MediaSuggestionsController as cc'
+          }
+        }
       });
 
 

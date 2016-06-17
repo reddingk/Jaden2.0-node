@@ -174,13 +174,17 @@
            }
            else {
              var itemList = "";
+             var compList = "";
              console.log(results);
+             for(var j =0; j < results.Similar.Info.length; j++) {
+               compList += results.Similar.Info[j].Name +" (" + results.Similar.Info[j].Type +")";
+               compList += (j+1 < results.Similar.Info.length ? " & " : "");
+             }
              for(var j =0; j < results.Similar.Results.length; j++) {
                itemList += results.Similar.Results[j].Name +" (" + results.Similar.Results[j].Type +")";
-               if(j+1 < results.Similar.Results.length)
-                 itemList+=", ";
+               itemList += (j+1 < results.Similar.Results.length ? ", " : ".");
              }
-             res =  {"code":1, "response": "According to Tastekid for " + results.Similar.Info[0].Name + " (" + results.Similar.Info[0].Type+") the following are sugguested that you checkout: " + itemList};
+             res =  {"code":1, "response": "According to Tastekid for " + compList +".  The following are sugguested that you checkout: " + itemList};
            }
            def.resolve(res);
            return def.promise;

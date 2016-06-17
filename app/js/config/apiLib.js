@@ -15,25 +15,37 @@
         default: function() {
           var def = $q.defer();
           def.resolve("");
-          return def.promise;          
+          return def.promise;
         },
         tastekid: {
           all_similar: function(query) {
             var api = apiData.getApiItem("tasteKid");
             if(api != null) {
               var api_url = api.link +"similar?q="+query+"&callback=JSON_CALLBACK&k="+api.key;
-              //&callback=test()
               var def = $q.defer();
-
               $http.jsonp(api_url)
               .success(function (data) {
                 def.resolve(data);
               });
-
               return def.promise;
             }
             else
             { return null; }
+          },
+          type_similar: function(query, type, info) {
+            var api = apiData.getApiItem("tasteKid");
+            if(api != null) {
+              var api_url = api.link +"similar?q="+query+"&callback=JSON_CALLBACK&k="+ api.key + (type != "all"? "&type="+type : "") + (info == 1 ? "&info=1":"");
+              var def = $q.defer();
+              $http.jsonp(api_url)
+              .success(function (data) {
+                def.resolve(data);
+              });
+              return def.promise;
+            }
+            else
+            { return null; }
+
           }
         }
       }

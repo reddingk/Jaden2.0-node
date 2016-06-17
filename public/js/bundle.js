@@ -6,8 +6,11 @@
 		angular.module('headerCtrl', ['ui.bootstrap']);
     angular.module('homeCtrl', ['ui.bootstrap']);
 		angular.module('jadaCtrl', ['ui.bootstrap']);
+		/*Chip Ctrls*/
+		angular.module('mediaSuggestionsCtrl', ['ui.bootstrap']);
 
-    angular.module('JadenApp', ['ngMaterial','ngAnimate', 'ui.router','directives', 'config', 'dataconfig', 'headerCtrl','homeCtrl', 'jadaCtrl']);
+		/**/
+    angular.module('JadenApp', ['ngMaterial','ngAnimate', 'ui.router','directives', 'config', 'dataconfig', 'headerCtrl','homeCtrl', 'jadaCtrl', 'mediaSuggestionsCtrl']);
 
 })();
 
@@ -28,25 +31,37 @@
         default: function() {
           var def = $q.defer();
           def.resolve("");
-          return def.promise;          
+          return def.promise;
         },
         tastekid: {
           all_similar: function(query) {
             var api = apiData.getApiItem("tasteKid");
             if(api != null) {
               var api_url = api.link +"similar?q="+query+"&callback=JSON_CALLBACK&k="+api.key;
-              //&callback=test()
               var def = $q.defer();
-
               $http.jsonp(api_url)
               .success(function (data) {
                 def.resolve(data);
               });
-
               return def.promise;
             }
             else
             { return null; }
+          },
+          type_similar: function(query, type, info) {
+            var api = apiData.getApiItem("tasteKid");
+            if(api != null) {
+              var api_url = api.link +"similar?q="+query+"&callback=JSON_CALLBACK&k="+ api.key + (type != "all"? "&type="+type : "") + (info == 1 ? "&info=1":"");
+              var def = $q.defer();
+              $http.jsonp(api_url)
+              .success(function (data) {
+                def.resolve(data);
+              });
+              return def.promise;
+            }
+            else
+            { return null; }
+
           }
         }
       }
@@ -112,7 +127,8 @@
          {"id":2, "title":"Social", "icon":"fa-users", "span":[2,2], "link":"app.construction"},
          {"id":3, "title":"Camera", "icon":"fa-camera", "span":[1,1], "link":"app.construction"},
          {"id":4, "title":"Google Tools", "icon":"fa-google", "span":[1,1], "link":"app.construction"},
-         {"id":5, "title":"Dinner Time", "icon":"fa-cutlery", "span":[2,2], "link":"app.construction"}
+         {"id":5, "title":"Dinner Time", "icon":"fa-cutlery", "span":[2,2], "link":"app.construction"},
+         {"id":6, "title":"Media Suggestions", "icon":"fa-ticket", "span":[1,1], "link":"app.mediaSuggestions"}
        ];
 
      }
@@ -260,6 +276,7 @@
          return result;
        }
 
+       /*Get the local time*/
        function _getLocalTime() {
          var date = new Date();
          var h = (date.getHours() > 12 ? date.getHours() - 12 : date.getHours());
@@ -270,6 +287,7 @@
          return {"code":1, "response": timeStr};
        }
 
+       /*Get the time from a specific location*/
        function _getTimeZoneTime(responseFunction, strPhrase) {
          var res;
          if(strPhrase.indexOf(responseFunction.action) + 1 >= strPhrase.length)
@@ -281,6 +299,7 @@
          return res;
        }
 
+       /*Get all similar media for a media item*/
        function _getTastekidResults(responseFunction, strPhrase) {
          var def = $q.defer();
          var media = strPhrase.splice(strPhrase.indexOf(responseFunction.action) + 1, strPhrase.length);
@@ -290,15 +309,22 @@
            if(results == null) {
              res =  {"code":-2, "response": "Something is up with searching for: " + media.join("+")};
            }
+           else if(results.Similar.Results.length == 0) {
+             res =  {"code":0, "response": "Sorry there are no media suggestions for " + results.Similar.Info[0].Name + ", maybe you have the wrong title?"};
+           }
            else {
              var itemList = "";
+             var compList = "";
              console.log(results);
+             for(var j =0; j < results.Similar.Info.length; j++) {
+               compList += results.Similar.Info[j].Name +" (" + results.Similar.Info[j].Type +")";
+               compList += (j+1 < results.Similar.Info.length ? " & " : "");
+             }
              for(var j =0; j < results.Similar.Results.length; j++) {
                itemList += results.Similar.Results[j].Name +" (" + results.Similar.Results[j].Type +")";
-               if(j+1 < results.Similar.Results.length)
-                 itemList+=", ";
+               itemList += (j+1 < results.Similar.Results.length ? ", " : ".");
              }
-             res =  {"code":1, "response": "According to Tastekid for " + results.Similar.Info[0].Name + " (" + results.Similar.Info[0].Type+") the following are sugguested that you checkout: " + itemList};
+             res =  {"code":1, "response": "According to Tastekid for " + compList +".  The following are sugguested that you checkout: " + itemList};
            }
            def.resolve(res);
            return def.promise;
@@ -348,6 +374,16 @@
             templateUrl: 'views/construction.html'
           }
         }
+      })
+      /*Chip views*/
+      .state('app.mediaSuggestions', {
+        url: "mediaSuggestions",
+        views: {
+          'content@': {
+            templateUrl: 'views/chipviews/mediaSuggestions.html',
+            controller: 'MediaSuggestionsController as cc'
+          }
+        }
       });
 
 
@@ -355,39 +391,6 @@
       //$locationProvider.html5Mode(true);
     }]);
 
-
-})();
-
-(function(){
-   "use strict";
-
-    angular.module('directives').directive('navHold', ['$window', function($window) {
-      return {
-        restrict: 'EA',
-        link: function ($scope, element, attrs) {
-
-          angular.element($window).bind("scroll", function() {
-
-            var topSection = angular.element(document.getElementsByClassName("mainBody"))[0];
-            var windowp = angular.element($window)[0];
-            var topThreshhold = topSection.offsetTop - element[0].clientHeight
-
-            if(windowp.pageYOffset >= topThreshhold){
-              if(!element.hasClass("screenPass")){
-                element.addClass("screenPass");
-              }
-            }
-            else {
-              if(element.hasClass("screenPass")){
-                element.removeClass("screenPass");
-              }
-            }
-
-          });
-        }
-      }
-
-    }]);
 
 })();
 
@@ -504,5 +507,94 @@
       }
 
     }]);
+
+})();
+
+(function(){
+   "use strict";
+
+    angular.module('directives').directive('navHold', ['$window', function($window) {
+      return {
+        restrict: 'EA',
+        link: function ($scope, element, attrs) {
+
+          angular.element($window).bind("scroll", function() {
+
+            var topSection = angular.element(document.getElementsByClassName("mainBody"))[0];
+            var windowp = angular.element($window)[0];
+            var topThreshhold = topSection.offsetTop - element[0].clientHeight
+
+            if(windowp.pageYOffset >= topThreshhold){
+              if(!element.hasClass("screenPass")){
+                element.addClass("screenPass");
+              }
+            }
+            else {
+              if(element.hasClass("screenPass")){
+                element.removeClass("screenPass");
+              }
+            }
+
+          });
+        }
+      }
+
+    }]);
+
+})();
+
+(function(){
+ "use strict";
+
+  angular.module('mediaSuggestionsCtrl').controller('MediaSuggestionsController', ['$state', '$q', 'jadenInfo', 'jBrainInfo','apiInfo', function($state, $q, jadenInfo, jBrainInfo, apiInfo){
+    var vm = this;
+
+    /*Variables*/
+    vm.title = "Media Suggestions";
+    vm.chips = [];
+    vm.chipMax = 8;
+    vm.items = [{"name":"all", "icon":"fa-globe"},{"name":"movie", "icon":"fa-film"}, {"name":"show", "icon":"fa-television"}, {"name":"music", "icon":"fa-music"},{"name":"book", "icon":"fa-book"},{"name":"author", "icon":"fa-pencil-square-o"}, {"name":"game", "icon":"fa-gamepad"}];
+    vm.selectedItem = vm.items[0];
+    vm.search = "";
+    vm.simResults = [];
+
+    /*Functions*/
+    vm.changeFocus = changeFocus;
+    vm.changeType = changeType;
+    vm.getSimilarMedia = getSimilarMedia;
+    vm.getAdditionalChips = getAdditionalChips;
+    /*Start up functions*/
+    vm.getAdditionalChips();
+
+    /*Functions*/
+    function getAdditionalChips() {
+      var tmpchips = jadenInfo.chips.all();
+      var colorArray = randomColor({ count: vm.chipMax, luminosity: 'dark', format: 'rgb'});
+
+      for(var i =0; i < tmpchips.length; i++) {
+        if(tmpchips[i].title != vm.title && (i+1) <= vm.chipMax){
+          tmpchips[i].color = colorArray[i];
+          vm.chips.push(tmpchips[i]);
+        }
+      }
+    }
+
+    function changeFocus(newstate) {
+      $state.go(newstate);
+    }
+
+    function changeType(item){
+      console.log(item);
+      vm.selectedItem = item;
+    }
+
+    function getSimilarMedia() {
+      apiInfo.tastekid.type_similar(vm.search, vm.selectedItem.name, 1).then(function(results){
+        console.log(results);
+        vm.simResults = results;
+      });
+    }
+
+  }]);
 
 })();

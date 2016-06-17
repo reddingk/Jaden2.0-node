@@ -1,0 +1,68 @@
+.chipLayout {
+  padding: 0 2%;
+
+  section {
+    &.selectedScreen {
+      min-height: 500px;
+      border: 3px solid rgba(0,0,0,0.6);
+      padding: 2%;
+      h1 { font-weight: bold; width: 60%; border-bottom: 2px solid rgba(0,0,0,1);}
+      .chipsearch {
+        .searchBar { display: inline-block; width: 60%;}
+        .selectGroup {
+          display: inline-block;
+          width: 20%;
+          .select-button {
+            min-width: 100%;
+            border-radius: 0;
+            p {
+              border: 1px solid rgba(0,0,0,0.4);
+              text-align: right;
+              padding-right: 10px;
+              .selected-icon { padding-right: 3px;}
+            }
+          }
+        }
+        .searchBtnGroup { width:19%; display: inline-block; }
+      }
+      .listResults {
+        .panel-group {
+          .panel {
+            .panel-heading { }
+            .panel-collapse {
+              .panel-body {
+                div {
+                  div {
+                    display: block;
+                    &.item-header { border-bottom: 1px solid rgba(0,0,0,0.5); font-weight: bold; margin-bottom: 5px;}
+                    &.item-content { }
+                    &.item-video { a { i { color: rgba(229,45,39,1); &:hover, &:focus { color: rgba(0,0,0,1); } } }}
+                    &.item-content { }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    &.additionalChips {
+      margin-top: 20px;
+      .additionalTiles {
+        md-grid-list {
+          md-grid-tile {
+            border: 3px solid rgba(0,0,0,0.6);
+            opacity: 0.7;
+            cursor: pointer;
+            color:rgba(255,255,255,1);
+
+            &:hover, &:focus {
+              border: 3px solid rgba(0,0,0,1);
+              opacity: 1;
+            }
+          }
+        }
+      }
+    }
+  }
+}
