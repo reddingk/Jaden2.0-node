@@ -9,11 +9,16 @@
       return {
         list: {
           all: function(){
-            return chips;
+            return api_list;
           }
         },
+        default: function() {
+          var def = $q.defer();
+          def.resolve("");
+          return def.promise;          
+        },
         tastekid: {
-          all_similar: function(query) {            
+          all_similar: function(query) {
             var api = apiData.getApiItem("tasteKid");
             if(api != null) {
               var api_url = api.link +"similar?q="+query+"&callback=JSON_CALLBACK&k="+api.key;
